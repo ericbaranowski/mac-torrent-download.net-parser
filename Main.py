@@ -1,47 +1,67 @@
-from tkinter import * 
-from search import * 
+import sys
+from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtWidgets import *
+from search import *
 
-class GUI_Function():
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
 
-    def torrentsParse(self, event):
-        userParse = textBoxParsing.get()
-        self.torrentsList = Search(userParse)
-        torrentsListBox.delete(0, END)
-        torrentPropertyListBox.delete(0,END)
-        for torrent in self.torrentsList:
-            torrentsListBox.insert(END, torrent.text)
+    def initUI(self):
+        self.resize(300, 600)
+        self.statusBar().showMessage("Ready!")
+
+        self.setWindowTitle("MacTorrentParser")
+
+        parserWidget = TorrentParserWindow()        
+        self.setCentralWidget(parserWidget)
+
+
+
+class TorrentParserWindow(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def torrentsParse(self):
+        text = self.torrentEdit.text()
+        self.torrentList = Search(text)
+        for torrent in self.torrentList:
+            self.list.addItem(torrent.text)
+
+    def initUI(self):
+
+        torrent = QLabel("Input torrent name")
+        self.torrentEdit = QLineEdit()
+        self.torrentEdit.setText("Adobe")
+
+        parsingButton = QPushButton("Parsing")
+        parsingButton.clicked.connect(self.torrentsParse)
+
+        stopButton = QPushButton("Stop!")
+
+        self.list = QListWidget()
+
+        grid = QGridLayout()
+        grid.setSpacing(10)
+
+        grid.addWidget(torrent, 1, 0)
+        grid.addWidget(self.torrentEdit, 1, 1)
+
+        grid.addWidget(parsingButton, 2, 0)
+        grid.addWidget(stopButton, 2, 1)
+
+        grid.addWidget(self.list, 3, 0, 5, 2)
+
+        self.setLayout(grid)
         
-    def onselectTorrent(self, event):
-        widget = event.widget
-        index = int(widget.curselection()[0])
-        linkTorrent = self.torrentsList[index].get("href")
-        torrent, magnet = ParsingTorrent(linkTorrent)
-        self.printTorrentInListBox(torrent, magnet)
+def main():
+    app = QApplication(sys.argv)
+    mainWindow = MainWindow()
+    mainWindow.show()
+    app.exec_()
 
-    def printTorrentInListBox(self, torrent, magnet):
-        torrentPropertyListBox.delete(0,END)
-        torrentPropertyListBox.insert(END, torrent)
-        torrentPropertyListBox.insert(END, magnet)
-
-GUI_Function = GUI_Function()
-
-root = Tk()
-root.title("MacTorrentParser")
-root.geometry("1000x780+300+200")
-
-textBoxParsing = Entry(root)
-textBoxParsing.bind("<Return>", GUI_Function.torrentsParse)
-textBoxParsing.pack()
-
-buttonParsing = Button(root, bg = "red", text ="Parse!", command = GUI_Function.torrentsParse).pack()
-
-torrentsListBox = Listbox(root, height = 20, width = 100, selectmode = SINGLE)
-torrentsListBox.bind('<<ListboxSelect>>', GUI_Function.onselectTorrent)
-torrentsListBox.place(x = 20, y = 20)
-torrentsListBox.pack()
-
-torrentPropertyListBox = Listbox(root, height = 120, width = 50, selectmode = SINGLE)
-torrentPropertyListBox.place(x = 120, y = 120)
-torrentPropertyListBox.pack()
-
-root.mainloop()
+if __name__ == '__main__':
+    main()
