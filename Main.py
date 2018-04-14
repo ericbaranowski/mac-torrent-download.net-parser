@@ -9,7 +9,8 @@ class MainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.resize(300, 600)
+        self.setFixedSize(300, 600)
+        #self.setWindowState(QtCore.Qt.Window) TODO 
         self.statusBar().showMessage("Ready!")
 
         self.setWindowTitle("MacTorrentParser")
@@ -27,13 +28,14 @@ class TorrentParserWindow(QWidget):
 
     def torrentsParse(self):
         text = self.torrentEdit.text()
-        self.torrentList = Search(text)
-        for torrent in self.torrentList:
+        torrentList = Search(text)
+        for torrent in torrentList:
             self.list.addItem(torrent.text)
 
     def initUI(self):
 
         torrent = QLabel("Input torrent name")
+
         self.torrentEdit = QLineEdit()
         self.torrentEdit.setText("Adobe")
 
