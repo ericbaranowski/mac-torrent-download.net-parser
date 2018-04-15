@@ -11,7 +11,7 @@ def Search(searchName):
 
 def ParsingTorrents(category, currentPage, name):
     link = f"https://mac-torrent-download.net/{category}page/{currentPage}/{name}"
-    requestsall = requests.get(link)
+    requestsall = requests.get(link, headers={'Connection': 'close'})
     soup = BeautifulSoup(requestsall.content, "html.parser")
     torrents_search = soup.find_all("a",{"rel":"bookmark"})
 
